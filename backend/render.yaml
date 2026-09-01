@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: ayush-portal-api
+    env: python
+    region: singapore          # pick the region closest to your users
+    plan: free                 # bump to 'starter' or higher for production
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: CRON_SECRET
+        sync: false
+
+  # Optional: scheduled job to trigger scholarship/deadline notifications.
+  # Render Cron Jobs are a separate service type (not on the free web plan
+  # in all regions) — alternatively trigger /api/cron/scholarship-alerts
+  # from a GitHub Actions scheduled workflow or an external cron service
+  # like cron-job.org, passing the X-Cron-Secret header.
+  - type: cron
+    name: ayush-portal-scholarship-alerts
+    env: python
+    region: singapore
+    plan: free
+    schedule: "0 3 * * *"       # daily at 03:00 UTC
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: >
+      curl -X POST https://ayush-portal-api.onrender.com/api/cron/scholarship-alerts
+      -H "X-Cron-Secret: $CRON_SECRET"
+    envVars:
+      - key: CRON_SECRET
+        sync: false
