@@ -45,9 +45,7 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 app = FastAPI(title="Ayush Academia-Industry Portal API", version="1.0.0")
 
 ALLOWED_ORIGINS = [
-    "http://localhost:5173",                       # local Vite dev
-    "https://ayush-portal.vercel.app",              # replace with your Vercel prod domain
-    "https://ayush-portal-*.vercel.app",            # Vercel preview deployments (see note below)
+    "https://ayush-portal1.vercel.app/"            # Vercel preview deployments (see note below)
 ]
 
 app.add_middleware(
